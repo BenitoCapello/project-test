@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Crews list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Birthdate</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for crew in crews %}
+            <tr>
+                <td><a href="{{ path('crew_show', { 'id': crew.id }) }}">{{ crew.id }}</a></td>
+                <td>{{ crew.firstname }}</td>
+                <td>{{ crew.lastname }}</td>
+                <td>{% if crew.birthDate %}{{ crew.birthDate|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('crew_show', { 'id': crew.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('crew_edit', { 'id': crew.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('crew_new') }}">Create a new crew</a>
+        </li>
+    </ul>
+{% endblock %}

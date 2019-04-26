@@ -1,0 +1,57 @@
+<?php
+
+namespace AppBundle\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use AppBundle\Entity\Crew;
+use AppBundle\Entity\Harbor;
+use AppBundle\Entity\Ship;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use Swagger\Annotations as SWG;
+use AppBundle\Service\CrewService;
+
+class DefaultController extends Controller
+{
+    private $crewService;
+
+    public function __construct(CrewService $crewService)
+    {
+        $this->crewService = $crewService;
+    }
+
+    /**
+     * @Route("/", name="homepage")
+     */
+    public function indexAction(Request $request)
+    {
+        // $query        = $this->get('doctrine')->getRepository(Crew::class)->getCrewMembers();
+        // $formatedCrew = $this->crewService->getFormatedCrewMembers($query, 1, 15, $request);
+        //$formatedCrew = $this->crewService->getFormatedShipCrewMembers(null, ['id', 'firstname', 'lastname', 'birth_date'], 10, 1);
+//die('ok');
+        //\dump($formatedCrew);
+        //die();
+        $crew = $this->get('doctrine')->getRepository(Crew::class)->restrictedInformationCrew(['id', 'firstname', 'lastname']);
+        //\dump($this->get('doctrine')->getManager()->getConnection()->prepare($query)->execute());die();
+        // replace this example code with whatever you need
+        return $this->render('default/homepage.html.twig', [
+            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
+            'crew'     => array(),//$crew,
+        ]);
+    }
+
+    /**
+     * @Route("/crewmember/{id}", name="crewmember", methods={"GET"})
+     */
+    public function crewAction(int $id)
+    {
+        $crewmember = $this->get('doctrine')->getRepository(Crew::class)->restrictedInformationCrewMember($id, ['id', 'firstname', 'lastname']);
+        // \dump($crewmember);die();
+        // replace this example code with whatever you need
+        return $this->render('default/crew.html.twig', [
+            'crewmember' => $crewmember,
+        ]);
+    }
+}

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+            <div id="welcome">
+                <h1><span>Hey</span> Symfony version : {{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}</h1>
+            </div>
+
+            <div id="status">
+                <p>
+
+                    Your application is now ready. You can start working on it at:
+                    <code>{{ base_dir }}</code>
+                </p>
+            </div>
+
+            <div id="next">
+                <h2>Crew List</h2>
+                {% for crewmember in crew %}
+                    <div>
+                        {{ crewmember.id }} | {{ crewmember.firstname }} | {{ crewmember.lastname }}
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+{% endblock %}

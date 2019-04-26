@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+            <div id="welcome">
+                <h1><span>Hey</span> {{ crewmember.firstname}}</h1>
+            </div>
+
+            <div id="next">
+                <h2>Here are your infos</h2>
+                {% for key,value in crewmember %}
+                    <div>
+                        {{ key }} : {{ value }}
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+{% endblock %}
