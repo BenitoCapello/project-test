@@ -19,6 +19,12 @@ class CrewRepository extends ServiceEntityRepository//\Doctrine\ORM\EntityReposi
         parent::__construct($registry, Crew::class, Ship::class);
     }
 
+    // This will return a QueryBuilder instance
+    public function qbAll()
+    {
+        return $this->createQueryBuilder("c");
+    }
+
     public function restrictedInformationCrew(?array $collumns = ['id'], ?int $limit = 10, ?int $offset = 0, ?bool $count = false): array
     {
         $table    = $this->getClassMetadata()->table["name"];

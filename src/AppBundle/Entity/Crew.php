@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Crew
@@ -19,6 +20,8 @@ class Crew
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $id;
 
@@ -26,6 +29,8 @@ class Crew
      * @var string
      * @SWG\Property(type="string", maxLength=255, description="Firstname of the crew")
      * @ORM\Column(name="firstname", type="string", length=255)
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $firstname;
 
@@ -33,6 +38,8 @@ class Crew
      * @var string
      * @SWG\Property(type="string", maxLength=255, description="Lastname of the crew")
      * @ORM\Column(name="lastname", type="string", length=255)
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $lastname;
 
@@ -40,6 +47,8 @@ class Crew
      * @var \DateTime
      * @SWG\Property(type="datetime", description="Birthdate of the crew")
      * @ORM\Column(name="birth_date", type="datetime")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $birthDate;
 
@@ -48,6 +57,8 @@ class Crew
      * @SWG\Property(type="integer", description="job id of the crew")
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Job", inversedBy="workers")
      * @ORM\JoinColumn(name="job_id", referencedColumnName="id", nullable=false)
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $job;
 
@@ -56,6 +67,8 @@ class Crew
      * @SWG\Property(type="integer", description="ship id of crew working in")
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Ship", inversedBy="crewMembers")
      * @ORM\JoinColumn(name="ship_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $ship;
 

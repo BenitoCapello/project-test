@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Ship
@@ -20,6 +21,8 @@ class Ship
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $id;
 
@@ -31,6 +34,8 @@ class Ship
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $name;
 
@@ -38,6 +43,8 @@ class Ship
      * @var string
      *
      * @ORM\Column(name="unique_id", type="string", length=255, unique=true)
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $uniqueId;
 
@@ -45,6 +52,8 @@ class Ship
      * @var float
      *
      * @ORM\Column(name="drought", type="float")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $drought;
 
@@ -52,6 +61,8 @@ class Ship
      * @var float
      *
      * @ORM\Column(name="length", type="float")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $length;
 
@@ -59,6 +70,8 @@ class Ship
      * @var float
      *
      * @ORM\Column(name="width", type="float")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $width;
 
@@ -66,6 +79,8 @@ class Ship
      * @var int|1
      *
      * @ORM\Column(name="capacity", type="integer")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $capacity;
 
@@ -73,6 +88,8 @@ class Ship
      * @var int
      *
      * @ORM\Column(name="power_type", type="integer")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $powerType;
 
@@ -80,6 +97,8 @@ class Ship
      * @var int|null
      *
      * @ORM\Column(name="engine_power", type="integer", nullable=true)
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $enginePower;
 
@@ -87,6 +106,8 @@ class Ship
      * @var float|null
      *
      * @ORM\Column(name="sail_max_heigh", type="float", nullable=true)
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $sailMaxHeigh;
 
@@ -94,6 +115,8 @@ class Ship
      * @var int|null
      *
      * @ORM\Column(name="sail_count", type="integer", nullable=true)
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $sailCount;
 
@@ -101,6 +124,8 @@ class Ship
      * @var \DateTime
      *
      * @ORM\Column(name="date_creation", type="datetime")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $dateCreation;
 
@@ -109,6 +134,8 @@ class Ship
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Harbor")
      * @ORM\JoinColumn(nullable=false)
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $harborBuilt;
 
@@ -117,6 +144,8 @@ class Ship
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Job", inversedBy="ships")
      * @ORM\JoinColumn(name="job_id", referencedColumnName="id", nullable=false)
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $job;
 

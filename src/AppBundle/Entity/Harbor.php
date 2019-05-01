@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Harbor
@@ -20,6 +21,8 @@ class Harbor
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $id;
 
@@ -27,6 +30,8 @@ class Harbor
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $name;
 
@@ -34,6 +39,8 @@ class Harbor
      * @var float
      *
      * @ORM\Column(name="drought_allowed", type="float")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $droughtAllowed;
 
@@ -41,6 +48,8 @@ class Harbor
      * @var int
      *
      * @ORM\Column(name="max_allowed_length", type="integer")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $maxAllowedLength;
 
@@ -48,6 +57,8 @@ class Harbor
      * @var int
      *
      * @ORM\Column(name="max_allowed_width", type="integer")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $maxAllowedWidth;
 
@@ -55,12 +66,16 @@ class Harbor
      * @var int
      *
      * @ORM\Column(name="accommodation_capacity", type="integer")
+     *
+     * @Serializer\Groups({"detail"})
      */
     private $accommodationCapacity;
 
     /**
      * @var Job[]|ArrayCollection
      *
+     * @Serializer\Groups({"detail"})
+     * 
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Job", mappedBy="harbors", cascade="persist")
      * @ORM\JoinTable(name="harbor_jobs", 
      *  joinColumns={

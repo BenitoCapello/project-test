@@ -21,6 +21,7 @@ use Swagger\Annotations as SWG;
 use AppBundle\Service\HarborService;
 use AppBundle\Service\JobService;
 use AppBundle\Service\ShipService;
+use JMS\Serializer\SerializationContext;
 
 /**
  * Harbor controller.
@@ -68,13 +69,12 @@ class HarborController extends FOSRestController
      */
     public function indexAction(Request $request): JsonResponse
     {
-        $formatedHarbors = $this->harborService->getFormatedHarbors(
-            ['id', 'name', 'drought_allowed', 'max_allowed_length', 'max_allowed_width', 'accommodation_capacity'],
+        $data = $this->harborService->getFormatedHarbors(
             $request->query->get('page'),
             $request->query->get('limit')
         );
 
-        return new JsonResponse($formatedHarbors);
+        return new JsonResponse($data);
     }
 
     /**
@@ -115,14 +115,13 @@ class HarborController extends FOSRestController
      */
     public function harborJobsAction(Request $request, int $harborId): JsonResponse
     {
-        $formatedJobs = $this->jobService->getFormatedHarborJobs(
-            $harborId,
-            ['id', 'name'],
+        $data = $this->jobService->getFormatedJobs(
             $request->query->get('page'),
-            $request->query->get('limit')
+            $request->query->get('limit'),
+            $harborId
         );
 
-        return new JsonResponse($formatedJobs);
+        return new JsonResponse($data);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Job
@@ -20,6 +21,8 @@ class Job
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $id;
 
@@ -27,6 +30,8 @@ class Job
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $name;
 

@@ -81,6 +81,16 @@ nelmio_api_doc:
                 - ^/ship
                 - ^/stat
 
+jms_serializer:
+    handlers:
+        datetime:
+            default_format: "Y-m-d H:i:s"
+            default_timezone: "UTC"
+
+fos_rest:
+    serializer:
+        serialize_null:  true
+
 knp_paginator:
     page_range: 5                      
     default_options:

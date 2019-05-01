@@ -19,6 +19,12 @@ class JobRepository extends ServiceEntityRepository//\Doctrine\ORM\EntityReposit
         parent::__construct($registry, Job::class, Harbor::class);
     }
 
+    // This will return a QueryBuilder instance
+    public function qbAll()
+    {
+        return $this->createQueryBuilder("j");
+    }
+
     public function restrictedInformationJobs(?array $collumns = ['id'], ?int $limit = 10, ?int $offset = 0, ?bool $count = false): array
     {
         $table    = $this->getClassMetadata()->table["name"];

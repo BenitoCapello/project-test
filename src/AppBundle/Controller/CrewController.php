@@ -19,6 +19,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RequestParam;
 use Swagger\Annotations as SWG;
 use AppBundle\Service\CrewService;
+use JMS\Serializer\SerializationContext;
 
 /**
  * Crew controller.
@@ -62,13 +63,12 @@ class CrewController extends FOSRestController
      */
     public function indexAction(Request $request): JsonResponse
     {
-        $formatedCrew = $this->crewService->getFormatedCrewMembers(
-            ['id', 'firstname', 'lastname', 'birth_date'],
+        $data = $this->crewService->getFormatedCrewMembers(
             $request->query->get('page'),
             $request->query->get('limit')
         );
 
-        return new JsonResponse($formatedCrew);
+        return new JsonResponse($data);
     }
 
     /**
@@ -100,14 +100,13 @@ class CrewController extends FOSRestController
      */
     public function unasignedCrewAction(Request $request): JsonResponse
     {
-        $formatedCrew = $this->crewService->getFormatedShipCrewMembers(
-            null,
-            ['id', 'firstname', 'lastname', 'birth_date'],
+        $data = $this->crewService->getFormatedCrewMembers(
             $request->query->get('page'),
-            $request->query->get('limit')
+            $request->query->get('limit'),
+            true
         );
 
-        return new JsonResponse($formatedCrew);
+        return new JsonResponse($data);
     }
 
     /**
@@ -155,7 +154,7 @@ class CrewController extends FOSRestController
      *     )
      * )
      */
-    public function newAction(Request $request): JsonResponse
+    public function newAction(Request $request): Response
     {
         $em    = $this->getDoctrine()->getManager();
         $jobId = $request->query->get('job_id');
@@ -178,13 +177,16 @@ class CrewController extends FOSRestController
             return new JsonResponse(['message' => 'Something went wrong bro...'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse([
-            'id'        => $crew->getId(),
-            'firstname' => $crew->getFirstname(),
-            'lastname'  => $crew->getLastname(),
-            'birthdate' => $crew->getBirthDate()->format('Y-m-d H:i:s'),
-            'job_id'    => $jobId
-        ]);
+        $data = $this->get('jms_serializer')->serialize($crew, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'job'  => ['list'],
+            'ship' => ['list']
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -208,19 +210,25 @@ class CrewController extends FOSRestController
      *     )
      * )
      */
-    public function showAction(int $crewId): JsonResponse
+    public function showAction(int $crewId): Response
     {
         $em   = $this->getDoctrine()->getManager();
-        $crew = $em->getRepository('AppBundle:Crew')->restrictedInformationCrewMember(
-            $crewId,
-            ['id', 'firstname', 'lastname', 'birth_date', 'job_id', 'ship_id']
-        );
+        $crew = $em->getRepository('AppBundle:Crew')->find($crewId);
 
         if(null === $crew) {
             return new JsonResponse(['message' => 'Crew not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse($crew);
+        $data = $this->get('jms_serializer')->serialize($crew, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'job'  => ['list'],
+            'ship' => ['list']
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -286,7 +294,7 @@ class CrewController extends FOSRestController
      *     description="apply for ship"
      * )
      */
-    public function appyShipAction(int $crewId, int $shipId): JsonResponse
+    public function applyShipAction(int $crewId, int $shipId): JsonResponse
     {
         $em     = $this->getDoctrine()->getManager();
         $crew   = $em->getRepository('AppBundle:Crew')->find($crewId);
@@ -314,7 +322,6 @@ class CrewController extends FOSRestController
         }
 
         $crew->setShip($ship);
-        $em->persist($crew);
         $em->flush();
 
         return new JsonResponse(['message' => 'apply successfull']);
@@ -366,7 +373,7 @@ class CrewController extends FOSRestController
      *     )
      * )
      */
-    public function editAction(Request $request, int $crewId): JsonResponse
+    public function editAction(Request $request, int $crewId): Response
     {
         $em   = $this->getDoctrine()->getManager();
         $crew = $em->getRepository('AppBundle:Crew')->find($crewId);
@@ -379,15 +386,18 @@ class CrewController extends FOSRestController
         $crew->setLastname($request->query->get('lastname'));
         $crew->setBirthDate(new \DateTime($request->query->get('birthdate')));
 
-        $em->persist($crew);
         $em->flush();
 
-        return new JsonResponse([
-            'id'        => $crew->getId(),
-            'firstname' => $crew->getFirstname(),
-            'lastname'  => $crew->getLastname(),
-            'birthdate' => $crew->getBirthDate()->format('Y-m-d H:i:s')
-        ]);
+        $data = $this->get('jms_serializer')->serialize($crew, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'job'  => ['list'],
+            'ship' => ['list']
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**

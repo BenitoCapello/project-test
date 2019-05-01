@@ -3,15 +3,22 @@
 namespace AppBundle\Service;
 use AppBundle\Repository\ShipRepository;
 use AppBundle\Entity\Ship;
+use Knp\Component\Pager\PaginatorInterface;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 
 
 class ShipService
 {
     private $shipRepository;
+    private $paginator;
+    private $serialiser;
 
-    public function __construct(ShipRepository $shipRepository)
+    public function __construct(ShipRepository $shipRepository, PaginatorInterface $paginator, SerializerInterface $serialiser)
     {
         $this->shipRepository = $shipRepository;
+        $this->paginator      = $paginator;
+        $this->serialiser     = $serialiser;
     }
 
     // not proper format but i did what i could
