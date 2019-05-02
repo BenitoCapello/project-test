@@ -23,7 +23,7 @@ class CrewService
     }
 
     // not proper format but i did what i could
-    public function getFormatedCrewMembers(/*?array $collumns = array(),*/ ?int $page = 1, ?int $limit = 10, ?bool $unasignated = false): array
+    public function getFormatedCrewMembers(/*?array $collumns = array(),*/ ?int $page = 1, ?int $limit = 10, ?bool $unasignated = false, $shipId = false): array
     {
         $limit   = ($limit > 100) ? 100 : $limit;
         $offset  = ($page - 1) * $limit;
@@ -45,6 +45,10 @@ class CrewService
         $query = $this->crewRepository->qbAll();
         if ($unasignated) {
             $query->where('c.ship IS NULL');
+        }
+
+        if ($shipId) {
+            $query->where('c.ship = '. $shipId);
         }
 
         $paginator  = $this->paginator;

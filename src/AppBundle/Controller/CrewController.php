@@ -154,7 +154,7 @@ class CrewController extends FOSRestController
      *     )
      * )
      */
-    public function newAction(Request $request): Response
+    public function newAction(Request $request)
     {
         $em    = $this->getDoctrine()->getManager();
         $jobId = $request->query->get('job_id');
@@ -210,7 +210,7 @@ class CrewController extends FOSRestController
      *     )
      * )
      */
-    public function showAction(int $crewId): Response
+    public function showAction(int $crewId)
     {
         $em   = $this->getDoctrine()->getManager();
         $crew = $em->getRepository('AppBundle:Crew')->find($crewId);
@@ -373,7 +373,7 @@ class CrewController extends FOSRestController
      *     )
      * )
      */
-    public function editAction(Request $request, int $crewId): Response
+    public function editAction(Request $request, int $crewId)
     {
         $em   = $this->getDoctrine()->getManager();
         $crew = $em->getRepository('AppBundle:Crew')->find($crewId);

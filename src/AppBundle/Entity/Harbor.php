@@ -76,14 +76,10 @@ class Harbor
      *
      * @Serializer\Groups({"detail"})
      * 
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Job", mappedBy="harbors", cascade="persist")
-     * @ORM\JoinTable(name="harbor_jobs", 
-     *  joinColumns={
-     *      @ORM\JoinColumn(name="harbor_id", referencedColumnName="id", onDelete="CASCADE")
-     *  },
-     *  inverseJoinColumns={
-     *      @ORM\JoinColumn(name="job_id", referencedColumnName="id")
-     *  }
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Job", inversedBy="harbors")
+     * @ORM\JoinTable(name="harbor_jobs",
+     *    joinColumns={@ORM\JoinColumn(name="harbor_id", referencedColumnName="id")},
+     *    inverseJoinColumns={@ORM\JoinColumn(name="job_id", referencedColumnName="id")}
      * )
      */
     private $jobs;

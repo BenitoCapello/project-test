@@ -22,26 +22,28 @@ class ShipService
     }
 
     // not proper format but i did what i could
-    public function getFormatedShips(?array $collumns = array(), ?int $page = 1, ?int $limit = 10): array
+    public function getFormatedShips(/*?array $collumns = array(),*/ ?int $page = 1, ?int $limit = 10): array
     {
         $limit   = ($limit > 100) ? 100 : $limit;
         $offset  = ($page - 1) * $limit;
 
-        $count = $this->shipRepository->restrictedInformationShips(
-            $collumns,
-            $limit,
-            $offset,
-            true
-        );
-        $count   = reset($count)['count'];
+        $query = $this->shipRepository->qbAll();
 
-        $harbors = $this->shipRepository->restrictedInformationShips(
-            $collumns,
-            $limit,
-            $offset
+        $paginator  = $this->paginator;
+        $pagination = $paginator->paginate(
+            $query,
+            $page,
+            $limit
         );
 
-        return ['totalItems' => $count, 'page' => $page, 'limit' => $limit, 'totalPages' => ceil($count / $limit), 'Items' => $harbors];
+        $count      = $pagination->getTotalItemCount();
+        $totalPages = $pagination->getPageCount();
+
+        $data = $this->serialiser->serialize($pagination->getItems(), 'json', SerializationContext::create()->setGroups([
+            'list'
+        ]));
+
+        return ['totalItems' => $count, 'page' => $page, 'limit' => $limit, 'totalPages' => $totalPages, 'Items' => json_decode($data)];
     }
 
     public function getFormatedHarborShips(int $harborId, ?array $collumns = array(), ?int $page = 1, ?int $limit = 10): array

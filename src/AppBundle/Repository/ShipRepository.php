@@ -20,6 +20,12 @@ class ShipRepository extends ServiceEntityRepository//\Doctrine\ORM\EntityReposi
         parent::__construct($registry, Ship::class, Travel::class, Harbor::class);
     }
 
+    // This will return a QueryBuilder instance
+    public function qbAll()
+    {
+        return $this->createQueryBuilder("s");
+    }
+
     public function restrictedInformationShips(?array $collumns = ['id'], ?int $limit = 10, ?int $offset = 0, ?bool $count = false): array
     {
         $table    = $this->getClassMetadata()->table["name"];

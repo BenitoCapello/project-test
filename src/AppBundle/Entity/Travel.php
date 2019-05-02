@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Travel
@@ -18,6 +19,8 @@ class Travel
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $id;
 
@@ -25,6 +28,8 @@ class Travel
      * @var \DateTime
      *
      * @ORM\Column(name="travel_date", type="datetime")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $travelDate;
 
@@ -33,6 +38,8 @@ class Travel
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Ship", inversedBy="travelHistory")
      * @ORM\JoinColumn(name="ship_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $ship;
 
@@ -41,6 +48,8 @@ class Travel
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Harbor", inversedBy="departureHistory")
      * @ORM\JoinColumn(name="departure_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $harborDeparture;
 
@@ -49,6 +58,8 @@ class Travel
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Harbor", inversedBy="arivalHistory")
      * @ORM\JoinColumn(name="arival_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     *
+     * @Serializer\Groups({"list", "detail"})
      */
     private $harborArival;
 

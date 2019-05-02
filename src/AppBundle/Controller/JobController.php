@@ -19,6 +19,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RequestParam;
 use Swagger\Annotations as SWG;
 use AppBundle\Service\JobService;
+use JMS\Serializer\SerializationContext;
 
 /**
  * Job controller.
@@ -62,13 +63,12 @@ class JobController extends FOSRestController
      */
     public function indexAction(Request $request): JsonResponse
     {
-        $formatedJob = $this->jobService->getFormatedJobs(
-            ['id', 'name'],
+        $data = $this->jobService->getFormatedJobs(
             $request->query->get('page'),
             $request->query->get('limit')
         );
 
-        return new JsonResponse($formatedJob);
+        return new JsonResponse($data);
     }
 
     /**
@@ -92,7 +92,7 @@ class JobController extends FOSRestController
      *     )
      * )
      */
-    public function newAction(Request $request): JsonResponse
+    public function newAction(Request $request)
     {
         $em    = $this->getDoctrine()->getManager();
 
@@ -106,10 +106,14 @@ class JobController extends FOSRestController
             return new JsonResponse(['message' => 'Something went wrong bro...'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse([
-            'id'    => $job->getId(),
-            'name'  => $job->getName()
-        ]);
+        $data = $this->get('jms_serializer')->serialize($job, 'json', SerializationContext::create()->setGroups([
+            'detail'
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -133,19 +137,23 @@ class JobController extends FOSRestController
      *     )
      * )
      */
-    public function showAction(int $jobId): JsonResponse
+    public function showAction(int $jobId)
     {
         $em   = $this->getDoctrine()->getManager();
-        $job = $em->getRepository('AppBundle:Job')->restrictedInformationJob(
-            $jobId,
-            ['id', 'name']
-        );
+        $job = $em->getRepository('AppBundle:Job')->find($jobId);
 
         if(null === $job) {
             return new JsonResponse(['message' => 'Job not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse($job);
+        $data = $this->get('jms_serializer')->serialize($job, 'json', SerializationContext::create()->setGroups([
+            'detail'
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -178,7 +186,7 @@ class JobController extends FOSRestController
      *     )
      * )
      */
-    public function editAction(Request $request, int $jobId): JsonResponse
+    public function editAction(Request $request, int $jobId)
     {
         $em   = $this->getDoctrine()->getManager();
         $job  = $em->getRepository('AppBundle:Job')->find($jobId);
@@ -192,10 +200,14 @@ class JobController extends FOSRestController
         $em->persist($job);
         $em->flush();
 
-        return new JsonResponse([
-            'id'        => $job->getId(),
-            'name'      => $job->getName()
-        ]);
+        $data = $this->get('jms_serializer')->serialize($job, 'json', SerializationContext::create()->setGroups([
+            'detail'
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**

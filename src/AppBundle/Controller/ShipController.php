@@ -25,6 +25,7 @@ use AppBundle\Service\CrewService;
 use AppBundle\Service\HarborService;
 use AppBundle\Service\TravelService;
 use Ramsey\Uuid\Uuid;
+use JMS\Serializer\SerializationContext;
 
 /**
  * Ship controller.
@@ -74,13 +75,12 @@ class ShipController extends FOSRestController
      */
     public function indexAction(Request $request): JsonResponse
     {
-        $formatedShips = $this->shipService->getFormatedShips(
-            ['id', 'name', 'unique_id', 'drought', 'length', 'width', 'capacity', 'power_type', 'engine_power', 'sail_max_heigh', 'sail_count', 'date_creation'],
+        $data = $this->shipService->getFormatedShips(
             $request->query->get('page'),
             $request->query->get('limit')
         );
 
-        return new JsonResponse($formatedShips);
+        return new JsonResponse($data);
     }
 
     /**
@@ -121,14 +121,14 @@ class ShipController extends FOSRestController
      */
     public function shipCrewAction(Request $request, int $shipId): JsonResponse
     {
-        $formatedCrew = $this->crewService->getFormatedShipCrew(
-            $shipId,
-            ['id', 'firstname', 'lastname', 'birth_date'],
+        $data = $this->crewService->getFormatedCrewMembers(
             $request->query->get('page'),
-            $request->query->get('limit')
+            $request->query->get('limit'),
+            false,
+            $shipId
         );
 
-        return new JsonResponse($formatedCrew);
+        return new JsonResponse($data);
     }
 
     /**
@@ -169,14 +169,13 @@ class ShipController extends FOSRestController
      */
     public function shipTravelsAction(Request $request, int $shipId): JsonResponse
     {
-        $formatedTravel = $this->travelService->getFormatedTravels(
+        $data = $this->travelService->getFormatedTravels(
             $shipId,
-            ['id', 'ship_id', 'departure_id', 'travel_date', 'arival_id'],
             $request->query->get('page'),
             $request->query->get('limit')
         );
 
-        return new JsonResponse($formatedTravel);
+        return new JsonResponse($data);
     }
 
     /**
@@ -288,7 +287,7 @@ class ShipController extends FOSRestController
      *     )
      * )
      */
-    public function newTravelAction(Request $request, int $shipId, int $harborId): JsonResponse
+    public function newTravelAction(Request $request, int $shipId, int $harborId)
     {
         $em       = $this->getDoctrine()->getManager();
         $errors   = array();
@@ -326,13 +325,17 @@ class ShipController extends FOSRestController
             return new JsonResponse(['message' => 'Something went wrong bro...'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse([
-            'id'             => $travel->getId(),
-            'ship_id'        => $shipId,
-            'departure_id'   => $departureHarbor->getId(),
-            'arival_id'      => $harborId,
-            'date_creation'  => $travel->getTravelDate()->format('Y-m-d')
-        ]);
+        $data = $this->serialiser->serialize($travel, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'ship'            => ['list'],
+            'harborDeparture' => ['list'],
+            'harborArival'    => ['list'],
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -444,7 +447,7 @@ class ShipController extends FOSRestController
      *     )
      * )
      */
-    public function newAction(Request $request): JsonResponse
+    public function newAction(Request $request)
     {
         $em       = $this->getDoctrine()->getManager();
         $job      = $em->getRepository('AppBundle:Job')->find($request->query->get('job_id'));
@@ -486,22 +489,16 @@ class ShipController extends FOSRestController
             return new JsonResponse(['message' => 'Something went wrong bro...'], Response::HTTP_NOT_FOUND);
         }
 
-        $em->flush();
+        $data = $this->get('jms_serializer')->serialize($ship, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'jobs'        => ['list'],
+            'harborBuilt' => ['detail']
+        ]));
 
-        return new JsonResponse([
-            'id'             => $ship->getId(),
-            'name'           => $ship->getName(),
-            'unique_id'      => $ship->getUniqueId(),
-            'drought'        => $ship->getDrought(),
-            'length'         => $ship->getLength(),
-            'width'          => $ship->getWidth(),
-            'capacity'       => $ship->getCapacity(),
-            'power_type'     => $ship->getPowerType(),
-            'engine_power'   => $ship->getEnginePower(),
-            'sail_max_heigh' => $ship->getSailMaxHeigh(),
-            'sail_count'     => $ship->getSailCount(),
-            'date_creation'  => $ship->getDateCreation()->format('Y-m-d')
-        ]);
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -525,19 +522,25 @@ class ShipController extends FOSRestController
      *     )
      * )
      */
-    public function showAction(int $shipId): JsonResponse
+    public function showAction(int $shipId)
     {
         $em     = $this->getDoctrine()->getManager();
-        $ship   = $em->getRepository('AppBundle:Ship')->restrictedInformationShip(
-            $shipId,
-            ['id', 'name', 'unique_id', 'drought', 'length', 'width', 'capacity', 'power_type', 'engine_power', 'sail_max_heigh', 'sail_count', 'date_creation']
-        );
+        $ship   = $em->getRepository('AppBundle:Ship')->find($shipId);
 
         if(null === $ship) {
             return new JsonResponse(['message' => 'Ship not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse($ship);
+        $data = $this->get('jms_serializer')->serialize($ship, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'jobs'        => ['list'],
+            'harborBuilt' => ['list']
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -634,7 +637,7 @@ class ShipController extends FOSRestController
      *     )
      * )
      */
-    public function editAction(Request $request, int $shipId): JsonResponse
+    public function editAction(Request $request, int $shipId)
     {
         $em     = $this->getDoctrine()->getManager();
         $ship   = $em->getRepository('AppBundle:Ship')->find($shipId);
@@ -660,20 +663,16 @@ class ShipController extends FOSRestController
         //$em->persist($ship);
         $em->flush();
 
-        return new JsonResponse([
-            'id'             => $ship->getId(),
-            'name'           => $ship->getName(),
-            'unique_id'      => $ship->getUniqueId(),
-            'drought'        => $ship->getDrought(),
-            'length'         => $ship->getLength(),
-            'width'          => $ship->getWidth(),
-            'capacity'       => $ship->getCapacity(),
-            'power_type'     => $ship->getPowerType(),
-            'engine_power'   => $ship->getEnginePower(),
-            'sail_max_heigh' => $ship->getSailMaxHeigh(),
-            'sail_count'     => $ship->getSailCount(),
-            'date_creation'  => $ship->getDateCreation()->format('Y-m-d')
-        ]);
+        $data = $this->get('jms_serializer')->serialize($ship, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'jobs'        => ['list'],
+            'harborBuilt' => ['list']
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**

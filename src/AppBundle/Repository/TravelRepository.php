@@ -20,6 +20,12 @@ class TravelRepository extends ServiceEntityRepository//\Doctrine\ORM\EntityRepo
         parent::__construct($registry, Travel::class, Ship::class);
     }
 
+    // This will return a QueryBuilder instance
+    public function qbAll()
+    {
+        return $this->createQueryBuilder("t");
+    }
+
     public function restrictedInformationTravels(?int $shipId = null, ?array $collumns = ['id'], ?int $limit = 10, ?int $offset = 0, ?bool $count = false): array
     {
         $table    = $this->getClassMetadata()->table["name"];

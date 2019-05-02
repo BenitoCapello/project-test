@@ -52,8 +52,7 @@ class Job
     /**
      * @var Harbor[]|ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Harbor", mappedBy="jobs", cascade="persist")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     *  @ORM\ManyToMany(targetEntity="AppBundle\Entity\Harbor", mappedBy="jobs")
      * 
      */
     private $harbors;

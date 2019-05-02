@@ -232,7 +232,7 @@ class HarborController extends FOSRestController
      *     )
      * )
      */
-    public function newAction(Request $request): JsonResponse
+    public function newAction(Request $request)
     {
         $em       = $this->getDoctrine()->getManager();
         $jobIds   = explode(',', $request->query->get('job_ids'));
@@ -271,14 +271,15 @@ class HarborController extends FOSRestController
         //$em->persist($harbor);
         $em->flush();
 
-        return new JsonResponse([
-            'id'                     => $harbor->getId(),
-            'name'                   => $harbor->getName(),
-            'drought_allowed'        => $harbor->getDroughtAllowed(),
-            'max_allowed_length'     => $harbor->getMaxAllowedLength(),
-            'max_allowed_width'      => $harbor->getMaxAllowedWidth(),
-            'accommodation_capacity' => $harbor->getAccommodationCapacity()
-        ]);
+        $data = $this->get('jms_serializer')->serialize($harbor, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'jobs'  => ['list']
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -302,19 +303,24 @@ class HarborController extends FOSRestController
      *     )
      * )
      */
-    public function showAction(int $harborId): JsonResponse
+    public function showAction(int $harborId)
     {
         $em     = $this->getDoctrine()->getManager();
-        $harbor = $em->getRepository('AppBundle:Harbor')->restrictedInformationHarbor(
-            $harborId,
-            ['id', 'name', 'drought_allowed', 'max_allowed_length', 'max_allowed_width', 'accommodation_capacity']
-        );
+        $harbor = $em->getRepository('AppBundle:Harbor')->find($harborId);
 
         if(null === $harbor) {
             return new JsonResponse(['message' => 'Harbor not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse($harbor);
+        $data = $this->get('jms_serializer')->serialize($harbor, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'jobs'  => ['list']
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -397,14 +403,15 @@ class HarborController extends FOSRestController
         $em->persist($harbor);
         $em->flush();
 
-        return new JsonResponse([
-            'id'                     => $harbor->getId(),
-            'name'                   => $harbor->getName(),
-            'drought_allowed'        => $harbor->getDroughtAllowed(),
-            'max_allowed_length'     => $harbor->getMaxAllowedLength(),
-            'max_allowed_width'      => $harbor->getMaxAllowedWidth(),
-            'accommodation_capacity' => $harbor->getAccommodationCapacity()
-        ]);
+        $data = $this->get('jms_serializer')->serialize($harbor, 'json', SerializationContext::create()->setGroups([
+            'detail',
+            'jobs'  => ['list']
+        ]));
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
